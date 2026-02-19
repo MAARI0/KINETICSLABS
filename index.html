@@ -359,19 +359,32 @@
             <div class="w-20 h-20 bg-seak-orange text-white rounded-full flex items-center justify-center text-4xl mx-auto mb-6">
                 <i class="ph-bold ph-whatsapp-logo"></i>
             </div>
-            <h2 class="font-display font-bold text-2xl uppercase mb-2">Almost Done!</h2>
-            <p class="text-sm text-gray-500 mb-6">After paying on GPay, please confirm your address on WhatsApp.</p>
-            <button onclick="sendOrderToWhatsApp()" class="w-full bg-green-500 text-white font-bold py-4 rounded-xl shadow-lg mb-3 hover:bg-green-600">
-                Send Order Details
+            <h2 class="font-display font-bold text-2xl uppercase mb-2">Payment Made?</h2>
+            <p class="text-sm text-gray-500 mb-6 italic">Please fill in your details to confirm your order delivery.</p>
+            
+            <div class="space-y-4 mb-6 text-left">
+                <div>
+                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Full Delivery Address</label>
+                    <textarea id="order-address" class="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-seak-orange/20" rows="3" placeholder="Flat No, Building, Area, Pincode..."></textarea>
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">GPay Transaction ID</label>
+                    <input type="text" id="order-txn-id" class="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-seak-orange/20" placeholder="Paste ID from GPay App">
+                </div>
+            </div>
+
+            <button onclick="sendOrderToWhatsApp()" class="w-full bg-green-500 text-white font-bold py-4 rounded-xl shadow-lg mb-3 hover:bg-green-600 flex items-center justify-center gap-2">
+                <i class="ph-bold ph-paper-plane-tilt"></i>
+                Send Order & Confirm
             </button>
-            <button onclick="closeConfirmModal()" class="text-xs font-bold text-gray-400 uppercase">Close</button>
+            <button onclick="closeConfirmModal()" class="text-xs font-bold text-gray-400 uppercase">Go Back</button>
         </div>
     </div>
 
     <script>
         const VPA = "ketaneatworld31@okhdfcbank"; 
         const MERCHANT_NAME = "Sea-K Kinetic Foods";
-        const WHATSAPP_NUMBER = "919999999999"; 
+        const WHATSAPP_NUMBER = "919823971744"; 
 
         let cart = [];
 
@@ -477,16 +490,29 @@
         }
 
         function sendOrderToWhatsApp() {
+            const address = document.getElementById('order-address').value;
+            const txnId = document.getElementById('order-txn-id').value;
+
+            if (!address || !txnId) {
+                alert("Please provide both Address and Transaction ID to confirm your order.");
+                return;
+            }
+
             const items = cart.map(i => `${i.quantity}x ${i.name}`).join(', ');
             const count = cart.reduce((acc, item) => acc + item.quantity, 0);
             const discount = count >= 5 ? 50 : 0;
             let total = (count * 50) - discount;
-            const message = `*NEW ORDER ALERT!* 🚀%0A%0A*Items:* ${items}%0A*Promo:* ${discount > 0 ? '50FF FREE Applied (₹50 OFF)' : 'None'}%0A*Total Paid:* ₹${total}%0A*Status:* Paid via GPay%0A%0A_Please confirm my delivery address..._`;
+
+            const message = `*NEW ORDER CONFIRMED* 🚀%0A%0A*Items:* ${items}%0A*Total Paid:* ₹${total}%0A*Transaction ID:* ${txnId}%0A*Promo:* ${discount > 0 ? '5th FREE Pack Applied' : 'None'}%0A%0A*DELIVERY ADDRESS:*%0A${address.replace(/\n/g, '%0A')}%0A%0A_Sent from SEA-K Kinetic Foods_`;
+            
             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
             closeConfirmModal();
             cart = [];
             updateCartUI();
             closeCart();
+            // Clear inputs
+            document.getElementById('order-address').value = "";
+            document.getElementById('order-txn-id').value = "";
         }
 
         function closeConfirmModal() {
